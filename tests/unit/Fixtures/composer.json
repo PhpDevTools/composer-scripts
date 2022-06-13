@@ -1,0 +1,13 @@
+{
+	"name": "test-vendor/test-package",
+	"description": "Package to be used by testing.",
+	"license": "MIT",
+	"require": {
+		"test-vendor/test-package-required": "^1.2.3"
+	},
+	"extra": {
+		"branch-alias": {
+			"dev-main": "2.3.x-dev"
+		}
+	}
+}
