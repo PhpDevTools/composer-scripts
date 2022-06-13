@@ -2,5 +2,202 @@
 	"name": "gilbertsoft/composer-scripts",
 	"description": "",
 	"license": "MIT",
-	"type": "library"
+	"type": "library",
+	"keywords": [
+		"composer",
+		"scripts",
+		"development",
+		"release"
+	],
+	"readme": "README.md",
+	"authors": [
+		{
+			"name": "Simon Gilli",
+			"email": "simon.gilli@gilbertsoft.org",
+			"homepage": "https://gilbertsoft.org",
+			"role": "developer"
+		}
+	],
+	"homepage": "https://github.com/PhpDevTools/composer-scripts",
+	"support": {
+		"issues": "https://github.com/PhpDevTools/composer-scripts/issues",
+		"source": "https://github.com/PhpDevTools/composer-scripts"
+	},
+	"require": {
+		"php": "^7.2 || ^8.0",
+		"composer-plugin-api": "^2.0",
+		"composer/pcre": "^1.0 || ^2.0 || ^3.0",
+		"composer/semver": "^3.0"
+	},
+	"require-dev": {
+		"bamarni/composer-bin-plugin": "^1.8.1",
+		"composer/composer": "^2.0",
+		"ergebnis/composer-normalize": "^2.19"
+	},
+	"prefer-stable": true,
+	"autoload": {
+		"psr-4": {
+			"Gilbertsoft\\Composer\\": "src"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"Gilbertsoft\\Composer\\Build\\": "build",
+			"Gilbertsoft\\Composer\\Tests\\Unit\\": "tests/unit"
+		}
+	},
+	"config": {
+		"allow-plugins": {
+			"bamarni/composer-bin-plugin": true,
+			"ergebnis/composer-normalize": true
+		},
+		"sort-packages": true
+	},
+	"extra": {
+		"bamarni-bin": {
+			"bin-links": false,
+			"forward-command": false,
+			"target-directory": "tools"
+		},
+		"branch-alias": {
+			"dev-main": "0.1.x-dev"
+		}
+	},
+	"scripts": {
+		"post-install-cmd": [
+			"@tools:setup:install"
+		],
+		"post-update-cmd": [
+			"@tools:setup:update"
+		],
+		"bin": "echo 'bin not installed.'",
+		"ci": [
+			"@ci:static",
+			"@ci:dynamic"
+		],
+		"ci:composer": [
+			"@ci:composer:normalize",
+			"@ci:composer:validate",
+			"@ci:composer:require-checker"
+		],
+		"ci:composer:normalize": "@tools:composer:normalize",
+		"ci:composer:require-checker": "@tools:composer:require-checker",
+		"ci:composer:validate": "@tools:composer:validate",
+		"ci:dynamic": [
+			"@ci:tests"
+		],
+		"ci:php": [
+			"@ci:php:lint",
+			"@ci:php:rector",
+			"@ci:php:cs-fixer",
+			"@ci:php:copypaste",
+			"@ci:php:sniff",
+			"@ci:php:stan"
+		],
+		"ci:php:copypaste": "@tools:php:copypaste",
+		"ci:php:cs-fixer": "@tools:php:cs-fixer --using-cache no",
+		"ci:php:lint": "@tools:php:lint --no-progress",
+		"ci:php:rector": "@tools:php:rector --no-progress-bar",
+		"ci:php:sniff": "@tools:php:sniff",
+		"ci:php:sniff:strict": "@tools:php:sniff:strict",
+		"ci:php:stan": "@tools:php:stan --no-progress",
+		"ci:static": [
+			"@ci:composer",
+			"@ci:yaml:lint",
+			"@ci:php"
+		],
+		"ci:tests": [
+			"@ci:tests:unit",
+			"@ci:tests:functional",
+			"@ci:tests:smoke"
+		],
+		"ci:tests:functional": "@tools:tests:functional",
+		"ci:tests:smoke": "@tools:tests:smoke",
+		"ci:tests:unit": "@tools:tests:unit",
+		"ci:yaml:lint": "@tools:yaml:lint",
+		"clean": [
+			"@tools:setup:clean",
+			"rm -fr var vendor .php-cs-fixer.cache .phplint-cache || true"
+		],
+		"fix": [
+			"@fix:composer",
+			"@fix:php"
+		],
+		"fix:composer": [
+			"@fix:composer:normalize"
+		],
+		"fix:composer:normalize": [
+			"@composer normalize --ansi -n"
+		],
+		"fix:php": [
+			"@fix:php:rector",
+			"@fix:php:cs",
+			"@fix:php:sniff"
+		],
+		"fix:php:cs": "@php tools/php-cs-fixer/vendor/bin/php-cs-fixer fix",
+		"fix:php:rector": "@php tools/rector/vendor/bin/rector process --no-diffs",
+		"fix:php:sniff": "@php tools/phpcs/vendor/bin/phpcbf --standard=PSR12 src tests",
+		"set-version": [
+			"Gilbertsoft\\Composer\\Build\\ReleaseScripts::setVersion"
+		],
+		"tools": [
+			"@tools:static",
+			"@tools:dynamic"
+		],
+		"tools:composer": [
+			"@tools:composer:normalize",
+			"@tools:composer:validate",
+			"@tools:composer:require-checker"
+		],
+		"tools:composer:normalize": "@composer normalize --ansi -n --dry-run",
+		"tools:composer:require-checker": [
+			"@composer require --ansi -n composer/composer:^2.0",
+			"@php tools/composer-require-checker/vendor/bin/composer-require-checker",
+			"@composer require --ansi -n --dev composer/composer:^2.0"
+		],
+		"tools:composer:validate": "@composer validate --ansi -n --strict",
+		"tools:dynamic": [
+			"@tools:tests"
+		],
+		"tools:php": [
+			"@tools:php:lint",
+			"@tools:php:rector",
+			"@tools:php:cs-fixer",
+			"@tools:php:copypaste",
+			"@tools:php:sniff",
+			"@tools:php:stan"
+		],
+		"tools:php:copypaste": "@php tools/phpcpd/vendor/bin/phpcpd src tests",
+		"tools:php:cs-fixer": "@php tools/php-cs-fixer/vendor/bin/php-cs-fixer fix -v --dry-run --diff",
+		"tools:php:lint": "@php tools/phplint/vendor/bin/phplint --no-progress",
+		"tools:php:rector": "@php tools/rector/vendor/bin/rector process --dry-run",
+		"tools:php:sniff": "@php tools/phpcs/vendor/bin/phpcs --standard=PSR12 src tests",
+		"tools:php:sniff:strict": "@php tools/phpcs/vendor/bin/phpcs src tests",
+		"tools:php:stan": "@php tools/phpstan/vendor/bin/phpstan analyse --no-progress",
+		"tools:setup:clean": "rm -fr tools/**/composer.lock tools/**/vendor || true",
+		"tools:setup:install": "@composer bin all install --ansi",
+		"tools:setup:update": "@composer bin all update --ansi",
+		"tools:static": [
+			"@tools:composer",
+			"@tools:yaml:lint",
+			"@tools:php"
+		],
+		"tools:tests": [
+			"@tools:tests:unit",
+			"@tools:tests:functional",
+			"@tools:tests:smoke"
+		],
+		"tools:tests:functional": "echo 'Functional test placeholder'",
+		"tools:tests:smoke": "echo 'Smoke test placeholder'",
+		"tools:tests:unit": "@php tools/phpunit/vendor/bin/phpunit --testsuite 'Unit Test Suite'",
+		"tools:yaml:lint": "@php tools/yaml-lint/vendor/bin/yaml-lint .ddev .github"
+	},
+	"scripts-descriptions": {
+		"ci": "Runs development tools in CI mode.",
+		"clean": "Removes all development related files.",
+		"tools": "Runs development tools.",
+		"tools:setup:clean": "Clean development tools.",
+		"tools:setup:install": "Install development tools.",
+		"tools:setup:update": "Update development tools."
+	}
 }
