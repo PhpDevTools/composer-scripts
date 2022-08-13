@@ -1,0 +1,77 @@
+name: Continuous Integration (CI)
+
+on:
+  push:
+    branches:
+      - 'main'
+      - '[0-9]+.*'
+    paths-ignore:
+      - '.ddev/**'
+      - '.github/ISSUE_TEMPLATE/*'
+      - '.github/FUNDING.yml'
+      - '.vscode/*'
+      - '**.md'
+  pull_request:
+    paths-ignore:
+      - '.ddev/**'
+      - '.github/ISSUE_TEMPLATE/*'
+      - '.github/FUNDING.yml'
+      - '.vscode/*'
+      - '**.md'
+  schedule:
+    - cron: '44 4 * * *'
+
+env:
+  COMPOSER_ROOT_VERSION: 0.1.0
+  COMPOSER_FLAGS: --ansi --no-interaction --no-progress
+  COMPOSER_INSTALL_FLAGS: --prefer-dist
+  COMPOSER_UPDATE_FLAGS: ''
+
+jobs:
+  validation:
+    name: Composer validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          coverage: none
+          extensions: intl, zip
+          ini-values: memory_limit=-1, error_reporting=E_ALL, display_errors=On
+          php-version: latest
+          tools: composer
+
+      - name: Setup authentication for Composer
+        run: composer config github-oauth.github.com ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Composer Cache Vars
+        id: composer-cache-vars
+        run: |
+          echo "::set-output name=dir::$(composer config cache-files-dir)"
+          echo "::set-output name=timestamp::$(date +"%s")"
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer-cache-vars.outputs.dir }}
+          key: ${{ runner.os }}-composer-latest-stable-${{ steps.composer-cache-vars.outputs.timestamp }}
+          restore-keys: |
+            ${{ runner.os }}-composer-latest-stable-
+            ${{ runner.os }}-composer-latest-
+            ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: composer install ${{ env.COMPOSER_INSTALL_FLAGS }} ${{ env.COMPOSER_FLAGS }}
+
+      - name: Validate composer.json
+        run: composer ci:composer:validate
+
+      - name: Normalize composer.json
+        run: composer ci:composer:normalize
+
+      - name: Check dependencies
+        run: composer ci:composer:require-checker

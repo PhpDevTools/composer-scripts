@@ -1,0 +1,9 @@
+{
+	"require": {
+		"gilbertsoft/phpunit-tools": "dev-feature/phpunit-tools",
+		"nikic/php-parser": ">=4.14.0",
+		"phpspec/prophecy-phpunit": "^2.0.1",
+		"phpunit/phpunit": "^9.5.21",
+		"phpunit/phpcov": ">=8.2.1"
+	}
+}

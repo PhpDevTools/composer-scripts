@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+  bootstrap="vendor/autoload.php"
+  colors="true"
+  forceCoversAnnotation="true"
+  failOnRisky="true"
+  beStrictAboutChangesToGlobalState="true"
+  beStrictAboutOutputDuringTests="true"
+  beStrictAboutResourceUsageDuringSmallTests="true"
+  beStrictAboutTestsThatDoNotTestAnything="true"
+  beStrictAboutTodoAnnotatedTests="true"
+  beStrictAboutCoversAnnotation="true"
+  convertDeprecationsToExceptions="true"
+>
+  <coverage
+    cacheDirectory="var/cache/coverage"
+  >
+    <include>
+      <directory>src</directory>
+    </include>
+    <report>
+      <html outputDirectory="var/log/coverage/report"/>
+      <php outputFile="var/log/coverage/coverage.cov"/>
+    </report>
+  </coverage>
+  <testsuites>
+    <testsuite name="Unit Test Suite">
+      <directory>tests/unit</directory>
+    </testsuite>
+  </testsuites>
+  <extensions>
+    <extension class="Gilbertsoft\PHPUnit\Tools\Hook\BypassFinalsHook"/>
+  </extensions>
+  <logging>
+    <junit outputFile="var/log/junit.xml"/>
+    <testdoxHtml outputFile="var/log/testdox.html"/>
+    <testdoxText outputFile="var/log/testdox.txt"/>
+  </logging>
+</phpunit>
